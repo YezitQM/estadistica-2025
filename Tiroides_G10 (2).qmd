@@ -1,0 +1,339 @@
+---
+title: "Estadística descriptiva: resumen de datos"
+author: "GRUPO 10"
+format: html
+editor: visual
+---
+
+# Integrantes GRUPO 10:
+
+1.  Gutierrez Utrilla Annalisa Caterina
+2.  Huarcaya Anteza Carlos Ramiro
+3.  Peceros Arenas Edwin Adrian
+4.  Quispe Monroy Yezit Katerin
+5.  Zambrano Motta Miluska Sarai
+
+# Paquetes para resumir datos
+
+Instalar paquetes
+
+```{r}
+#install.packages("gtsummary")
+#install.packages("finalfit")
+#install.packages("flextable")
+```
+
+Cargar paquetes
+
+```{r}
+library(tidyverse)
+library(here)
+library(rio)
+library(gtsummary) ## Para la "Tabla 1"
+library(finalfit)
+library(flextable)
+```
+
+# Cargando los datos
+
+```{r}
+data_tiroides_G10 <- import(here("data_para_estudiantes", "tiroides_G10.csv"))
+```
+
+## Recuerda
+
+Antes de iniciar el análisis descriptivo de tus datos, estos deben ser inspeccionados para la eliminación de errores en la codificación o transformación de valores perdidos o anómalos.
+
+La transformación de variable (por ejemplo, para obtener una distribución similar a la normal) puede ocurrir en etapas avanzadas del análisis.
+
+### La "estructura" de los datos
+
+```{r}
+str(data_tiroides_G10)
+```
+
+# 1. Resumen de variables categóricas
+
+Para resumir variables categóricas usamos frecuencias simples y frecuencias porcentuales. Es importante resumir, también, los datos perdidos. Resumen con la función `table()` para la variable `Tiroides`.
+
+```{r}
+table(data_tiroides_G10$Riesgo, useNA = "ifany")
+```
+
+```{r}
+table(data_tiroides_G10$Funcion_Tiroidea, useNA = "ifany")
+```
+
+Con tidyverse
+
+```{r}
+data_tiroides_G10 |> 
+  dplyr::count(Funcion_Tiroidea, sort = TRUE)
+```
+
+Valores perdidos en proporciones
+
+```{r}
+prop.table(table(data_tiroides_G10$Funcion_Tiroidea, useNA = "ifany"))
+```
+
+# 2. Resumen de variables continuas
+
+Para resumir variables numéricas hay funciones en la base de R que permiten calcular los principales estadísticos. Por ejemplo, la función `mean()` y `sd()`, calcula el promedio y desviación estandard de un conjunto de datos.
+
+```{r}
+mean(data_tiroides_G10$Edad, na.rm = TRUE)
+```
+
+```{r}
+sd(data_tiroides_G10$Edad, na.rm = TRUE)
+```
+
+Ojo, en este ejemplo sólo será posible calcular el promedio y desviación estandard si el valor para el argumento na.rm es TRUE. Esto elimina los valores perdidos en el cálculo.
+
+Otras funciones que puedes encontrar útil son `min()`, `max()`, `median()` y `IQR()`
+
+El IQR es la diferencia entre el cuartil (Q3) y el primer cuartil (Q1)
+
+```{r}
+min(data_tiroides_G10$Edad, na.rm = TRUE) # Proporciona el valor mínimo
+
+IQR(data_tiroides_G10$Edad, na.rm = TRUE) # Calcula el rango intercuartilico
+
+median(data_tiroides_G10$Edad, na.rm = TRUE) # Calcula la mediana
+```
+
+### La función `summary()` para calcular todas las medidas, a la vez.
+
+`summary()` es una función nativa de R que permite calcular todas las medidas estadísticas a la vez. Abajo, un ejemplo con la variable Glucosa
+
+```{r}
+summary(data_tiroides_G10$Edad)
+```
+
+## ¿Mediana o media?
+
+Una de las cosas que queremos saber al realizar un análisis descriptivo es la distribución de los datos. La media y mediana puede informarnos al respecto. Abajo, un ejemplo para la variable `Edad`
+
+```{r}
+mean(data_tiroides_G10$Edad, na.rm = T)
+```
+
+```{r}
+median(data_tiroides_G10$Edad, na.rm = T)
+```
+
+La media y mediana de la variable `Edad`son similares. Estos sugiere que los datos tienen una distribución simétrica.
+
+Debajo otro ejemplo con la variable `Edad`
+
+```{r}
+mean(data_tiroides_G10$Edad, na.rm = T)
+```
+
+```{r}
+median(data_tiroides_G10$Edad, na.rm = T)
+```
+
+La media y mediana de la variable `Edad`son diferentes. Estos sugiere que los datos tienen una distribución asimétrica.
+
+Comprobémoslo visualmente
+
+```{r}
+par(mfrow=c(1,2)) # Configuramos e número de elementos por Figura
+hist(data_tiroides_G10$Edad)
+hist(data_tiroides_G10$Edad)
+```
+
+# \[resumen\] Por otra variable
+
+Frecuentemente es importante realizar el resumen de datos por otra variable. Por ejemplo, la media de edad según estado de diabetes o el número de individuos por grupo de edad. En R, podemos calcular esto usando la función `group_by()` y `summarize()`
+
+```{r}
+data_tiroides_G10 |> 
+  group_by(Edad) |> 
+  summarise(n_observ = n(),
+            porcentaje = (n_observ / nrow(data_tiroides_G10)*100))
+```
+
+```{r}
+data_tiroides_G10 |>  
+  group_by(Riesgo) |> 
+  summarize(promedio = mean(Edad, na.rm = T))
+```
+
+Podemos hacer resumenes incluso más complejos. Por ejemplo, calcular la media de glucosa por estado de Riesgo y categoría de `Edad`. Para esto, añade la variable edad a la función `group_by()`
+
+```{r}
+data_tiroides_G10 |>  
+  group_by(Riesgo) |> 
+  summarize(promedio = mean(Edad, na.rm = T))
+```
+
+Otros estadísticos
+
+```{r}
+data_tiroides_G10 |>  
+  group_by(Riesgo) |> 
+  summarize(promedio_edad = mean(Edad, na.rm = TRUE),
+            DE = sd(Edad, na.rm = TRUE),
+            max_valor_edad = max(Edad, na.rm = TRUE))
+```
+
+Estadística descriptiva condicional: resumen por grupo de estado de diabetes
+
+```{r}
+data_tiroides_G10 |>  
+  group_by(Edad) |> 
+  summarize(max_riesgo_tiroides = max(Edad[Riesgo == "Si"], na.rm = TRUE),
+            max_riesgo_no_tiroides = max(Edad[Riesgo == "No"], na.rm = TRUE),
+            prom_riesgo_tiroides = mean(Edad[Riesgo == "Si"], na.rm = TRUE),
+            prom_riesgo_no_tiroides = mean(Edad[Riesgo == "No"], na.rm = TRUE))
+```
+
+Percentiles del nivel de glucosa por grupo de edad solo en participantes con diabetes usando la función `filter()`
+
+```{r}
+data_tiroides_G10 |> 
+  filter(Riesgo == "Alto") |> 
+  group_by(Genero) |> 
+  summarize(
+    p25 = if (length(Edad) > 0) quantile(Edad, probs = 0.25, na.rm = TRUE) else NA_real_,
+    p50 = if (length(Edad) > 0) quantile(Edad, probs = 0.50, na.rm = TRUE) else NA_real_,
+    p75 = if (length(Edad) > 0) quantile(Edad, probs = 0.75, na.rm = TRUE) else NA_real_)
+```
+
+Usando `across()` para multiples estadísticos descriptivos para multiples variables
+
+```{r}
+data_tiroides_G10 |> 
+  group_by(Etapa) |> 
+  summarize(across(.cols = c(Edad),
+                   .fns = list("promedio" = mean, "DE" = sd, 
+                               "máximo" = max),
+                   na.rm = TRUE))
+```
+
+```{r}
+data_tiroides_G10 |> 
+  group_by(Etapa) |> 
+  summarize(across(.cols = where(is.numeric),
+                   .fns = list("promedio" = mean, "DE" = sd, 
+                               "máximo" = max),
+                   na.rm = TRUE))
+```
+
+# La "Tabla 1" con gtsummary
+
+```{r}
+#install.packages("finalfit")
+#install.packages("gtsummary")
+```
+
+```{r}
+library(gtsummary)
+```
+
+Tabla 1 básico
+
+```{r}
+data_tiroides_G10 |> 
+  select(Edad) |> 
+  tbl_summary()
+```
+
+```{r}
+data_tiroides_G10 |> 
+  select(Riesgo, Edad) |> 
+  tbl_summary(
+    by = Riesgo
+  )
+```
+
+Pero las tablas deben ser autoexplicativas...
+
+## Configurando el estilo e idioma
+
+```{r}
+theme_gtsummary_language(language = "es") # idioma es = español
+theme_gtsummary_journal(journal = "jama")
+```
+
+```{r}
+data_tiroides_G10 |> 
+  select(Edad,Etapa) |> 
+  tbl_summary(
+    by = Etapa
+  )
+```
+
+## Recodificación de variables y adición de nombres correctos a variables
+
+```{r}
+data_tiroides_G10_0 = data_tiroides_G10 |>
+  mutate(
+    Etapa = ff_label(Etapa, "Etapa del cáncer"),
+    
+    Etapa = as.factor(Etapa) |>
+      fct_relevel("I", "II", "III", "IVA", "IVB") |> 
+      ff_label("Etapa del cáncer"),
+    
+    Riesgo = ff_label(Riesgo, "Índice de Riesgo"),
+    
+    Riesgo = as.factor(Riesgo) |>
+      fct_relevel("Alto", "Intermedio", "Bajo") |>  # Reordeno los niveles según sea necesario
+      ff_label("Tiroides")
+  )
+```
+
+```{r}
+data_tiroides_G10_0 = data_tiroides_G10 |>
+  mutate(
+    Etapa = ff_label(Etapa, "Etapa del cáncer"),
+    
+    Etapa = as.factor(Etapa) |>
+      fct_relevel("I", "II", "III", "IVA", "IVB") |> 
+      ff_label("Etapa del cáncer"),
+    
+    Riesgo = ff_label(Riesgo, "Índice de Riesgo"),
+    
+    Riesgo = as.factor(Riesgo) |>
+      fct_relevel("Alto", "Intermedio", "Bajo") |>  # Reordeno los niveles según sea necesario
+      ff_label("Diabetes mellitus")
+  )
+```
+
+```{r}
+tabla_1.v1 = data_diabetes_0 |> 
+  select(Edad, grupo_edad, imc, Embarazos, insulina_cat, Diabetes, Glucosa) |> 
+  tbl_summary(by = Diabetes) 
+```
+
+Añadiendo nombre a la variable dependiente
+
+```{r}
+tabla_1.v2 = data_tiroides_G10_0 |> 
+  select(Edad,Riesgo) |> 
+  tbl_summary(by = Riesgo) |> 
+  modify_spanning_header(all_stat_cols() ~ "**Tiroides**") |>
+  add_overall() 
+```
+
+```{r}
+tabla_1 = data_tiroides_G10_0 |> 
+  select(Edad, Riesgo) |> 
+  tbl_summary(by = Riesgo) |> 
+  modify_spanning_header(all_stat_cols() ~ "**Tiroides**") |>
+  add_overall() |> 
+  modify_caption("**Tabla 1**. Características de los pacientes del departamento de medicina interna del Hospital Regional de Ica")
+```
+
+```{r}
+install.packages("flextable")
+library(flextable)
+```
+
+```{r}
+tabla_1_flex = as_flex_table(tabla_1) # Convertir a flex table
+save_as_docx(tabla_1_flex, path = "tabla_1_flex.docx") # Guardar tabla
+```

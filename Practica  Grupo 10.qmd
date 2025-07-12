@@ -1,0 +1,117 @@
+---
+title: "ACTIVIDAD 1"
+format: html
+editor: visual
+---
+
+# PRÁCTICA 1
+
+## GRUPO 10 - INTEGRANTES
+
+-   HUARCAYA ANTEZANA CARLOS RAMIRO
+
+-   ZAMBRANO MOTTA MILUSKA SARAI
+
+-   QUISPE MONROY YEZIT KATHERINE
+
+-   GUTIERREZ UTRILLA ANNALIA CATERINA
+
+-   PECEROS ARENAS EDWIN ADRIAN
+
+### FUNCIONES
+
+```{r}
+# Antes de crear una lista, primero empezaremos agregando diferentes tipos de vectores
+a = "ANNA"
+b = 30
+```
+
+```{r}
+#Con class veremos que tipo de vectores son
+class(a)
+class(b)
+```
+
+```{r}
+#Con is.vector vamos a comprobar que los vectores colocados sean simples
+is.vector(a) 
+is.vector(b)
+```
+
+### 1. Lista (list)
+
+La función se escribe (list.) y se usa para crear una lista de elementos heterogéneos , es decir que pueden ser de diferentes tipos. Ya sea datos , números , vectores , incluso otras listas.
+
+```{r}
+lista_ejemplo <- list(a, b)
+```
+
+```{r}
+#Podemos crear un vector con datos y agregarlo a la lista incluso después de creada, solo se debe volver a correr el chunk
+c <- c("R", "Phyton", "Excel")
+lista_ejemplo <- list(a, b, c)
+```
+
+### 2. Dataframe
+
+**Dataframe** se escribe con la función `data.frame()`, dónde se asignan nombres a las columnas y se ingresan sus respectivos valores. Sirve para organizar, consultar, filtrar, modificar y analizar datos estructurados, y es muy utilizado en análisis estadístico y científico.
+
+```{r}
+trabajadores = data.frame(nombres = c("Cecilia", "Víctor", "Luis", "Milagros"),
+                    sexo = c("f", "m", "m", "f"),
+                    edad = c(51, 45, 42, 50),
+                    puesto = c("Store manager", "Assistant store manager", "Team leader", "Staff leader"))
+```
+
+### 3. Rnorm
+
+La función se llama rnorm() y se utiliza para obtener números aleatorios siguiendo una distribución normal estándar. Sus componentes son n, mean y sd. Donde n va a ser la cantidad de números aleatorios que queremos obtener, mean será la media de esos números y sd la desviación estándar. Se puede usar para simular datos en rutinas de muestreo y simulación.
+
+```{r}
+rnorm(n = 21, mean = 30, sd = 7)
+```
+
+### 4. Set.seed
+
+La función se llama set.seed() y sirve para fijar una semilla aleatoria, lo que permite que los resultados de funciones aleatorias, como rnorm(), sean reproducibles. Es decir, al usar set.seed() los números aleatorios generados serán los mismos siempre. Por ejemplo, rnorm() genera números aleatorios siguiendo una distribución normal. Si usamos set.seed() antes de rnorm() obtendremos siempre los mismos resultados cada vez que corramos el código.
+
+El número que va dentro de los paréntesis en set.seed() es la "semilla" que determina la secuencia y el límite superior de números aleatorios. En caso del siguiente ejemplo colocamos "set.seed(80)", de manera que los número aleatorios que obtendremos serán siempre los mismos y ninguno será mayor que 80.
+
+```{r}
+set.seed(80)
+rnorm(n = 21, mean = 30, sd = 7)
+```
+
+### INSTALACIÓN DE PAQUETES
+
+```{r}
+install.packages("devtools")
+```
+
+```{r}
+library(devtools)
+```
+
+```{r}
+install.packages("shiny")
+```
+
+```{r}
+library(shiny)
+```
+
+```{r}
+install.packages("sourcetools")
+```
+
+```{r}
+library(sourcetools)
+```
+
+```{r}
+install.packages("htmltools")
+```
+
+```{r}
+library(htmltools)
+```
